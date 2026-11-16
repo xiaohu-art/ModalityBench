@@ -16,6 +16,8 @@ By default, the downloader links MJCF assets under `~/.local/share/modalitybench
 
 If the server cannot reach the official asset host reliably, set `MODALITYBENCH_ASSET_URL` to an HTTP mirror that preserves the MolmoSpaces directory layout (`scenes/ithor/20251217_with_occupancy` and `objects/thor/20251117`, including their index files).
 
+Downloads are staged under `MLSPACES_CACHE_DIR/downloads`. If a transfer stalls, rerun with the same cache directory to continue from the saved bytes. Keep enough disk space for both the archives and the extracted assets.
+
 ## Download and load a scene
 
 ```bash

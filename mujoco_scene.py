@@ -8,8 +8,10 @@ import xml.etree.ElementTree as ET
 
 
 def download_scene(scene: str = "FloorPlan1") -> Path:
-    from molmospaces_resources import R2RemoteStorage, ResourceManager
+    from molmospaces_resources import ResourceManager
     from molmospaces_resources.behaviors import InstallMode
+
+    from asset_storage import ResumableR2Storage
 
     if not scene.isalnum():
         raise ValueError("Expected an iTHOR scene ID such as FloorPlan1")
@@ -17,16 +19,21 @@ def download_scene(scene: str = "FloorPlan1") -> Path:
     assets = Path(os.environ.get("MLSPACES_ASSETS_DIR", "~/.local/share/modalitybench/mjcf")).expanduser().resolve()
     cache = Path(os.environ.get("MLSPACES_CACHE_DIR", "~/.cache/modalitybench/molmospaces")).expanduser().resolve()
     source = os.environ.get("MODALITYBENCH_ASSET_URL", "mujoco-thor-resources")
+    storage = ResumableR2Storage(source, cache / "downloads")
+    versions = {"scenes": {"ithor": "20251217_with_occupancy"}, "objects": {"thor": "20251117"}}
     manager = ResourceManager(
-        R2RemoteStorage(source),
+        storage,
         symlink_dir=assets,
         cache_dir=cache,
-        data_type_to_source_to_version={
-            "scenes": {"ithor": "20251217_with_occupancy"},
-            "objects": {"thor": "20251117"},
-        },
+        data_type_to_source_to_version=versions,
         source_overrides={("objects", "thor"): {"install_mode": InstallMode.ON_DEMAND}},
     )
+    # Stage the small indexes before setup creates a version directory in the cache.
+    for data_type, sources in versions.items():
+        for name in sources:
+            relative_path = manager.relative_path(data_type, name)
+            if not (cache / relative_path).is_dir():
+                storage.prepare_catalog(relative_path)
     manager.setup()
     filename = Path(f"{scene}_physics.xml")
     archives = manager.find_archives("scenes", "ithor", [filename])
