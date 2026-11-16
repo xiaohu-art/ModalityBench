@@ -4,34 +4,45 @@ import argparse
 import math
 import os
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 
 def download_scene(scene: str = "FloorPlan1") -> Path:
-    from molmospaces_resources import R2RemoteStorage, setup_resource_manager
+    from molmospaces_resources import R2RemoteStorage, ResourceManager
+    from molmospaces_resources.behaviors import InstallMode
 
     if not scene.isalnum():
         raise ValueError("Expected an iTHOR scene ID such as FloorPlan1")
 
-    assets = Path(os.environ.get("MLSPACES_ASSETS_DIR", "~/.local/share/modalitybench/mjcf")).expanduser()
-    cache = Path(os.environ.get("MLSPACES_CACHE_DIR", "~/.cache/modalitybench/molmospaces")).expanduser()
-    manager = setup_resource_manager(
-        R2RemoteStorage("mujoco-thor-resources"),
+    assets = Path(os.environ.get("MLSPACES_ASSETS_DIR", "~/.local/share/modalitybench/mjcf")).expanduser().resolve()
+    cache = Path(os.environ.get("MLSPACES_CACHE_DIR", "~/.cache/modalitybench/molmospaces")).expanduser().resolve()
+    source = os.environ.get("MODALITYBENCH_ASSET_URL", "mujoco-thor-resources")
+    manager = ResourceManager(
+        R2RemoteStorage(source),
         symlink_dir=assets,
         cache_dir=cache,
-        env_prefix="MLSPACES",
-        versions={
+        data_type_to_source_to_version={
             "scenes": {"ithor": "20251217_with_occupancy"},
             "objects": {"thor": "20251117"},
         },
+        source_overrides={("objects", "thor"): {"install_mode": InstallMode.ON_DEMAND}},
     )
+    manager.setup()
     filename = Path(f"{scene}_physics.xml")
     archives = manager.find_archives("scenes", "ithor", [filename])
-    if not archives:
-        raise FileNotFoundError(f"Scene {scene!r} is not in the MolmoSpaces iTHOR index")
     manager.install_packages("scenes", {"ithor": archives})
     scene_path = assets / "scenes" / "ithor" / filename
-    if not scene_path.is_file():
-        raise FileNotFoundError(scene_path)
+
+    # iTHOR physics XMLs refer to shared THOR files by paths relative to the scene.
+    thor_root = assets / "objects" / "thor"
+    thor_files = set()
+    for element in ET.parse(scene_path).iter():
+        if file := element.get("file"):
+            path = Path(os.path.abspath(scene_path.parent / file))
+            if path.is_relative_to(thor_root):
+                thor_files.add(path.relative_to(thor_root))
+    archives = manager.find_archives("objects", "thor", sorted(thor_files))
+    manager.install_packages("objects", {"thor": archives})
     return scene_path
 
 

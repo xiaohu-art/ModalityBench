@@ -12,7 +12,9 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-By default, the downloader links MJCF assets under `~/.local/share/modalitybench/mjcf` and caches files under `~/.cache/modalitybench/molmospaces`. Set `MLSPACES_ASSETS_DIR` and `MLSPACES_CACHE_DIR` to override those paths. Keep the MJCF assets directory separate from any existing USD cache. The first download also fetches about 1.5 GB of compressed THOR object assets shared by iTHOR scenes.
+By default, the downloader links MJCF assets under `~/.local/share/modalitybench/mjcf` and caches files under `~/.cache/modalitybench/molmospaces`. Set `MLSPACES_ASSETS_DIR` and `MLSPACES_CACHE_DIR` to override those paths. Keep the MJCF assets directory separate from any existing USD cache. The downloader fetches the archives referenced by the selected scene and reuses extracted archives on later runs. Shared archives can still be large. `FloorPlan1` requires about 1.1 GB of compressed assets on an empty cache.
+
+If the server cannot reach the official asset host reliably, set `MODALITYBENCH_ASSET_URL` to an HTTP mirror that preserves the MolmoSpaces directory layout (`scenes/ithor/20251217_with_occupancy` and `objects/thor/20251117`, including their index files).
 
 ## Download and load a scene
 
