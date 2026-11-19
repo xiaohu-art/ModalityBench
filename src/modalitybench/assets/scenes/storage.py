@@ -1,5 +1,3 @@
-"""Resumable downloads for the versioned MolmoSpaces asset store."""
-
 from pathlib import Path
 import re
 import shutil
@@ -12,15 +10,18 @@ from molmospaces_resources import R2RemoteStorage
 
 
 class ResumableR2Storage(R2RemoteStorage):
+    """Cached downloads with .part-file resume support."""
+
     def __init__(self, source: str, download_dir: Path):
         super().__init__(source)
         self.download_dir = download_dir
 
-    def prepare_catalog(self, relative_path: Path):
+    def prepare_catalog(self, relative_path: Path) -> Path:
         from molmospaces_resources.constants import COMBINED_TRIES_NAME, REMOTE_MANIFEST_NAME
 
         for filename in (REMOTE_MANIFEST_NAME, COMBINED_TRIES_NAME):
             self._download(relative_path / filename)
+        return self.download_dir / relative_path
 
     def fetch_file(self, relative_path, filename, dest):
         shutil.copyfile(self._download(relative_path / filename), dest / filename)

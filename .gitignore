@@ -151,6 +151,7 @@ activemq-data/
 .env
 .envrc
 .venv
+.venv-filament/
 env/
 venv/
 ENV/
@@ -216,3 +217,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Downloaded scene assets; keep the directory placeholder.
+/src/modalitybench/assets/scenes/data/*
+!/src/modalitybench/assets/scenes/data/.gitkeep
+
+# MuJoCo runtime diagnostics and viewer layout.
+/MUJOCO_LOG.TXT
+/imgui.ini

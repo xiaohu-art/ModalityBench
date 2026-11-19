@@ -1,0 +1,34 @@
+[project]
+name = "modalitybench"
+version = "0.1.0"
+description = "Load MolmoSpaces scenes in MuJoCo and render them with Filament."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+dependencies = [
+    "mujoco==4.0.1",
+    "molmospaces-resources==0.0.3a2",
+    "requests>=2.32,<3",
+    "filelock>=3,<5",
+    "numpy>=1.26",
+    "pillow>=10",
+    "typer>=0.20,<1",
+]
+
+[project.scripts]
+modalitybench = "scripts.main:app"
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+dev-mode-dirs = [".", "src"]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["scripts", "src/modalitybench"]
+sources = ["src"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["scripts", "src/modalitybench", "pyproject.toml", "README.md", "LICENSE", "uv.lock"]
