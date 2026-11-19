@@ -54,7 +54,7 @@ Create a separate environment and install the Filament-enabled MuJoCo wheel matc
 ```bash
 python3.11 -m venv .venv-filament
 source .venv-filament/bin/activate
-python -m pip install -r requirements-filament.txt \
+python -m pip install -r requirements.txt \
   /path/to/mujoco-3.7.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 python mujoco_scene.py --scene FloorPlan1 \
   --robot-mjcf ../mujoco_menagerie/unitree_g1/g1.xml \
