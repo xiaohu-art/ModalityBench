@@ -90,7 +90,18 @@ def main():
     parser.add_argument("--xyz", nargs=3, type=float, default=(0.0, 0.0, 0.0), metavar=("X", "Y", "Z"))
     parser.add_argument("--yaw-deg", type=float, default=0.0)
     parser.add_argument("--viewer", action="store_true")
+    parser.add_argument("--filament-png", type=Path, help="Render a PNG using the Filament MuJoCo build")
+    parser.add_argument("--width", type=int, default=960)
+    parser.add_argument("--height", type=int, default=720)
+    parser.add_argument("--lookat", nargs=3, type=float, default=(0, 0, 1))
+    parser.add_argument("--distance", type=float, default=1.5)
+    parser.add_argument("--azimuth", type=float, default=120)
+    parser.add_argument("--elevation", type=float, default=-15)
     args = parser.parse_args()
+    if args.width <= 0 or args.height <= 0 or args.distance <= 0:
+        parser.error("Image dimensions and camera distance must be positive")
+    if args.filament_png and (args.viewer or args.download_only):
+        parser.error("Use --filament-png with scene loading only")
 
     if args.download_only and (args.scene_mjcf or args.robot_mjcf or args.viewer):
         parser.error("--download-only expects a MolmoSpaces scene and no robot or viewer")
@@ -106,6 +117,11 @@ def main():
     if args.robot_mjcf:
         print(f"Robot: {args.robot_mjcf}, offset={tuple(args.xyz)}, yaw={args.yaw_deg} degrees")
     print(f"Loaded {model.nbody} bodies, {model.ngeom} geoms and {model.nu} actuators")
+    if args.filament_png:
+        from scene_render import render_filament
+
+        render_filament(model, data, args.filament_png, args.width, args.height,
+                        args.lookat, args.distance, args.azimuth, args.elevation)
     if args.viewer:
         from mujoco import viewer
 

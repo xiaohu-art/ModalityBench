@@ -1,0 +1,5 @@
+# Install the platform-specific MolmoSpaces Filament MuJoCo wheel separately.
+molmospaces-resources==0.0.3a2
+requests>=2.32,<3
+filelock>=3,<5
+pillow>=10
