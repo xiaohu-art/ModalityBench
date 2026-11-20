@@ -61,7 +61,7 @@ After it reports ready, start the controller in a second interactive terminal on
 uv run modalitybench sonic-keyboard --sonic-root /path/to/GR00T-WholeBodyControl
 ```
 
-Wait for the controller to load its models. In the controller terminal, use `]` to start control, `Enter` to enable planner mode, and `2` to select walking in the default standing motion set. Use `W/S` for forward/backward, `,` and `.` to strafe left/right, and `A/D` for forward motion with a left/right adjustment. After G1 stabilizes, press `9` in the simulation window to release the startup suspension. Press `O` in the controller terminal to stop the controller. The simulator and controller communicate on loopback. The room keeps its collision geometry with its furniture joints fixed.
+After the models load, press `]`, `Enter`, then `2` in the controller terminal. Once G1 is steady, press `9` in the simulator window to release the suspension. In the controller terminal, use `W/S` to move forward or backward, `,` / `.` to strafe, `A/D` to steer while moving, and `O` to stop.
 
 ## Structure
 
