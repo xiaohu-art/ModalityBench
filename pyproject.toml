@@ -1,7 +1,7 @@
 [project]
 name = "modalitybench"
 version = "0.1.0"
-description = "Load MolmoSpaces scenes in MuJoCo and render them with Filament."
+description = "MuJoCo environment for MolmoSpaces scene preview, Unitree G1 placement, and camera rendering."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
