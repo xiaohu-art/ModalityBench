@@ -1,4 +1,6 @@
 from enum import StrEnum
+from pathlib import Path
+import subprocess
 from typing import Annotated
 
 import typer
@@ -80,6 +82,48 @@ def download(
     for path in paths:
         typer.echo(path)
     typer.echo(f"Ready: {len(paths)} scene(s).")
+
+
+@app.command(help="Run a FloorPlan1 simulation with the GEAR-SONIC SDK bridge")
+def sonic(
+    sonic_root: Annotated[Path, typer.Option(exists=True, file_okay=False, resolve_path=True)],
+    scene_mjcf: Annotated[Path | None, typer.Option(exists=True, dir_okay=False, resolve_path=True)] = None,
+    headless: bool = False,
+):
+    if scene_mjcf is None:
+        from modalitybench.assets.scenes import load_scene
+
+        scene_mjcf = load_scene("FloorPlan1")
+    from importlib.util import find_spec
+
+    runner = find_spec("modalitybench.policy.sonic_sim").origin
+    command = [str(sonic_root / ".venv_sim/bin/python"), runner,
+               str(sonic_root), str(scene_mjcf.absolute())]
+    if headless:
+        command.append("--headless")
+    try:
+        raise typer.Exit(subprocess.call(command, cwd=sonic_root))
+    except FileNotFoundError as exc:
+        raise typer.BadParameter("Set up the GEAR-SONIC simulation environment first.") from exc
+
+
+@app.command(help="Start the original GEAR-SONIC keyboard planner on loopback")
+def sonic_keyboard(
+    sonic_root: Annotated[Path, typer.Option(exists=True, file_okay=False, resolve_path=True)],
+):
+    deploy = sonic_root / "gear_sonic_deploy"
+    binary = deploy / "target/release/g1_deploy_onnx_ref"
+    if not binary.is_file():
+        raise typer.BadParameter("Build the GEAR-SONIC deployment executable first.")
+    command = [
+        str(binary), "lo", "policy/release/model_decoder.onnx", "reference/example/",
+        "--obs-config", "policy/release/observation_config.yaml",
+        "--encoder-file", "policy/release/model_encoder.onnx",
+        "--planner-file", "planner/target_vel/V2/planner_sonic.onnx",
+        "--input-type", "keyboard", "--output-type", "all",
+        "--zmq-host", "localhost", "--disable-crc-check",
+    ]
+    raise typer.Exit(subprocess.call(command, cwd=deploy))
 
 
 if __name__ == "__main__":

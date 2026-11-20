@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-ModalityBench is a MuJoCo environment for robot teleoperation and data collection using MolmoSpaces scenes and Unitree G1. Current functionality covers scene downloads, Studio preview, bounding-box placement, robot state access, and camera rendering. Teleoperation and data recording remain planned functionality.
+ModalityBench is a MuJoCo environment for robot teleoperation and data collection using MolmoSpaces scenes and Unitree G1. Current functionality covers scene downloads, Studio preview, bounding-box placement, robot state access, camera rendering, and optional GEAR-SONIC keyboard control. Data recording remains planned functionality.
 
 - `scripts/main.py`: Typer CLI and application assembly.
 - `src/modalitybench/assets/scenes/`: MolmoSpaces catalog lookup, asset preparation, resumable storage, and Studio preview.
@@ -11,6 +11,7 @@ ModalityBench is a MuJoCo environment for robot teleoperation and data collectio
 - `src/modalitybench/utils/placement.py`: robot bounding boxes, collision queries, and XY/yaw sampling.
 - `src/modalitybench/simulator.py`: model composition, state, stepping, Filament rendering, and static Studio display.
 - `src/modalitybench/policy/base.py`: policy protocol for future control integration.
+- `src/modalitybench/policy/sonic_sim.py`: FloorPlan1 model composition and GEAR-SONIC simulator bridge.
 - `pyproject.toml` and `uv.lock`: packaging, dependencies, and CLI entry point.
 - `README.md`: user-facing setup and usage.
 
