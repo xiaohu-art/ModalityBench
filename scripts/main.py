@@ -96,7 +96,7 @@ def sonic(
         scene_mjcf = load_scene("FloorPlan1")
     from importlib.util import find_spec
 
-    runner = find_spec("modalitybench.policy.sonic_sim").origin
+    runner = find_spec("modalitybench.policy.sonic_keyboard_sim").origin
     command = [str(sonic_root / ".venv_sim/bin/python"), runner,
                str(sonic_root), str(scene_mjcf.absolute())]
     if headless:
